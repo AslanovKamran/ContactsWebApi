@@ -1,5 +1,6 @@
 ﻿
 using AspWebApiGlebTest.Repository.cs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AspWebApiGlebTest.Controllers
@@ -19,6 +20,7 @@ namespace AspWebApiGlebTest.Controllers
 
 		[HttpGet]
 		[ProducesResponseType(200)]
+		[ProducesResponseType(401)]
 		public async Task<IActionResult> GetUsers()
 		{
 			var users = await _repos.GetUsersAsync();

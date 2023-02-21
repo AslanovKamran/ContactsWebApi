@@ -1,6 +1,7 @@
 ﻿using AspWebApiGlebTest.Models;
 using AspWebApiGlebTest.Models.DTOs;
 using AspWebApiGlebTest.Repository.cs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AspWebApiGlebTest.Controllers
@@ -26,6 +27,8 @@ namespace AspWebApiGlebTest.Controllers
 
 		[HttpGet]
 		[ProducesResponseType(200)]
+		[ProducesResponseType(401)]
+		[Authorize(Roles ="User,Admin")]
 		public async Task <IActionResult>GetCotacts()
 		{
 			var contacts = await _repos.GetContactsAsync();
@@ -41,7 +44,9 @@ namespace AspWebApiGlebTest.Controllers
 		[HttpGet]
 		[Route("{id}")]
 		[ProducesResponseType(200)]
+		[ProducesResponseType(401)]
 		[ProducesResponseType(404)]
+		[Authorize(Roles = "User,Admin")]
 		public async Task<IActionResult> GetContact(int id)
 		{
 			var contact = await _repos.GetContactAsync(id);
@@ -57,6 +62,9 @@ namespace AspWebApiGlebTest.Controllers
 		[HttpPost]
 		[ProducesResponseType(201)]
 		[ProducesResponseType(400)]
+		[ProducesResponseType(401)]
+		[ProducesResponseType(403)]
+		[Authorize(Roles = "Admin")]
 		public async  Task<IActionResult> PostContact(PostContactDTO contactDTO)
 		{
 			
@@ -85,7 +93,10 @@ namespace AspWebApiGlebTest.Controllers
 		[HttpPut]
 		[ProducesResponseType(201)]
 		[ProducesResponseType(400)]
+		[ProducesResponseType(401)]
+		[ProducesResponseType(403)]
 		[ProducesResponseType(404)]
+		[Authorize(Roles = "Admin")]
 		public async Task<IActionResult> PutContact(Contact contact)
 		{
 			if (ModelState.IsValid)
@@ -113,7 +124,10 @@ namespace AspWebApiGlebTest.Controllers
 		[HttpDelete]
 		[Route("{id}")]
 		[ProducesResponseType(204)]
+		[ProducesResponseType(401)]
+		[ProducesResponseType(403)]
 		[ProducesResponseType(404)]
+		[Authorize(Roles = "Admin")]
 		public async Task<IActionResult> DeleteContact(int id)
 		{
 			var contact = await _repos.GetContactAsync(id);
