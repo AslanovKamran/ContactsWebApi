@@ -8,5 +8,7 @@ namespace AspWebApiGlebTest.Models
 		{
 		}
 		public DbSet<Contact> Contacts{ get; set; }
+		public DbSet<Role> Roles{ get; set; }
+		public DbSet<User> Users{ get; set; }
 	}
 }

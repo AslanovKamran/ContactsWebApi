@@ -18,14 +18,14 @@ namespace AspWebApiGlebTest.Repository.cs
 			return await _context.Contacts.ToListAsync();
 		}
 
-		//Get A specific Contact
+		//Get a specific Contact
 		public async Task<Contact> GetContactAsync(int id)
 		{
 			var contact = await _context.Contacts.FirstOrDefaultAsync(cont => cont.Id == id);
 			return contact!;
 		}
 
-		//Add A Contact
+		//Add a Contact
 		public async Task<Contact> AddContactAsync(Contact contact)
 		{
 			await _context.Contacts.AddAsync(contact);
@@ -33,6 +33,7 @@ namespace AspWebApiGlebTest.Repository.cs
 			return contact;
 		}
 
+		//Delete a Contact
 		public async Task DeleteContactAsync(int id)
 		{
 			var contactToDelete = await _context.Contacts.FirstOrDefaultAsync(cont => cont.Id == id);
@@ -43,6 +44,7 @@ namespace AspWebApiGlebTest.Repository.cs
 			}
 		}
 
+		//Update a contact
 		public async Task<Contact> UpdateContactAsync(Contact contact)
 		{
 			_context.Contacts.Update(contact);

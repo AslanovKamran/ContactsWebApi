@@ -39,13 +39,13 @@ namespace AspWebApiGlebTest.Controllers
 		/// <returns>Contact</returns>
 
 		[HttpGet]
+		[Route("{id}")]
 		[ProducesResponseType(200)]
 		[ProducesResponseType(404)]
-		[Route("{id}")]
 		public async Task<IActionResult> GetContact(int id)
 		{
 			var contact = await _repos.GetContactAsync(id);
-			return contact == null ? NotFound("No Such Contact") : Ok(contact);
+			return contact == null ? NotFound("No Such A Contact") : Ok(contact);
 		}
 
 		/// <summary>
@@ -73,7 +73,7 @@ namespace AspWebApiGlebTest.Controllers
 				contact = await _repos.AddContactAsync(contact);
 				return CreatedAtAction(nameof(GetContact),new { id = contact.Id}, contact);
 			}
-			return BadRequest("Post Error");
+			return BadRequest(ModelState);
 		}
 
 		/// <summary>
@@ -101,7 +101,7 @@ namespace AspWebApiGlebTest.Controllers
 				}
 
 			}
-			return BadRequest();
+			return BadRequest(ModelState);
 		}
 
 		/// <summary>

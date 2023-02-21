@@ -23,11 +23,15 @@ namespace AspWebApiGlebTest
 
 			var connectionString = builder.Configuration.GetConnectionString("Default");
 
+			#region EF Core 
+
 			builder.Services.AddScoped<IContactRepository, ContactRepositoryEFCore>();
+			builder.Services.AddScoped<IUserRepository, UserRepositoryEFCore>();
 			builder.Services.AddDbContext<ContactsDbContext>(options => 
 			{
 				options.UseSqlServer(connectionString);
 			});
+			#endregion
 
 			var app = builder.Build();
 			app.UseSwagger();
