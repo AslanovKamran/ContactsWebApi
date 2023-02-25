@@ -1,6 +1,6 @@
 ﻿using AspWebApiGlebTest.Models;
 using AspWebApiGlebTest.Models.DTOs;
-using AspWebApiGlebTest.Repository.cs;
+using AspWebApiGlebTest.Repository.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,9 +17,6 @@ namespace AspWebApiGlebTest.Controllers
 		public ContactsController(IContactRepository repos) => _repos = repos;
 
 
-
-
-
 		/// <summary>
 		/// Gets A List Of Contacts
 		/// </summary>
@@ -29,7 +26,7 @@ namespace AspWebApiGlebTest.Controllers
 		[ProducesResponseType(200)]
 		[ProducesResponseType(401)]
 		[Authorize(Roles ="User,Admin")]
-		public async Task <IActionResult>GetCotacts()
+		public async Task<IActionResult> GetCotacts()
 		{
 			var contacts = await _repos.GetContactsAsync();
 			return Ok(contacts);
@@ -65,21 +62,21 @@ namespace AspWebApiGlebTest.Controllers
 		[ProducesResponseType(401)]
 		[ProducesResponseType(403)]
 		[Authorize(Roles = "Admin")]
-		public async  Task<IActionResult> PostContact(PostContactDTO contactDTO)
+		public async Task<IActionResult> PostContact(PostContactDTO contactDTO)
 		{
-			
+
 			if (ModelState.IsValid)
 			{
 				Contact contact = new Contact()
-			{
-				Name = contactDTO.Name,
-				Surname = contactDTO.Surname,
-				Phone = contactDTO.Phone,
-				Email = contactDTO.Email,
-				IsFavorite = contactDTO.IsFavorite,
-			};
+				{
+					Name = contactDTO.Name,
+					Surname = contactDTO.Surname,
+					Phone = contactDTO.Phone,
+					Email = contactDTO.Email,
+					IsFavorite = contactDTO.IsFavorite,
+				};
 				contact = await _repos.AddContactAsync(contact);
-				return CreatedAtAction(nameof(GetContact),new { id = contact.Id}, contact);
+				return CreatedAtAction(nameof(GetContact), new { id = contact.Id }, contact);
 			}
 			return BadRequest(ModelState);
 		}
@@ -104,7 +101,7 @@ namespace AspWebApiGlebTest.Controllers
 				try
 				{
 					var updatedContact = await _repos.UpdateContactAsync(contact);
-					return CreatedAtAction(nameof(GetContact),new { id = updatedContact.Id }, updatedContact);
+					return CreatedAtAction(nameof(GetContact), new { id = updatedContact.Id }, updatedContact);
 				}
 				catch (Exception)
 				{
@@ -120,7 +117,7 @@ namespace AspWebApiGlebTest.Controllers
 		/// </summary>
 		/// <param name="id"></param>
 		/// <returns></returns>
-		
+
 		[HttpDelete]
 		[Route("{id}")]
 		[ProducesResponseType(204)]

@@ -1,15 +1,14 @@
 ﻿using AspWebApiGlebTest.Models;
+using AspWebApiGlebTest.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace AspWebApiGlebTest.Repository.cs
+namespace AspWebApiGlebTest.Repository
 {
 	public class ContactRepositoryEFCore : IContactRepository
 	{
 		private readonly ContactsDbContext _context;
-		public ContactRepositoryEFCore(ContactsDbContext context)
-		{
-			_context = context;
-		}
+		public ContactRepositoryEFCore(ContactsDbContext context) => _context = context;
+	
 
 
 		//Get All Contacts

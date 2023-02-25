@@ -1,7 +1,8 @@
 ﻿using AspWebApiGlebTest.Models;
+using AspWebApiGlebTest.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace AspWebApiGlebTest.Repository.cs
+namespace AspWebApiGlebTest.Repository
 {
 	public class UserRepositoryEFCore : IUserRepository
 	{
@@ -29,7 +30,7 @@ namespace AspWebApiGlebTest.Repository.cs
 			return user!;
 		}
 
-		//Add a User
+		//Add a User (Works Improperly)
 		public async Task<User> AddUserAsync(User user)
 		{
 			await _context.Users.AddAsync(user);

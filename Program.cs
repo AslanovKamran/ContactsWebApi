@@ -1,10 +1,14 @@
 using AspWebApiGlebTest.Models;
-using AspWebApiGlebTest.Repository.cs;
+using AspWebApiGlebTest.Repository;
+using AspWebApiGlebTest.Repository.Dapper;
+using AspWebApiGlebTest.Repository.Interfaces;
 using AspWebApiGlebTest.Tokens;
+
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+
 using System.Reflection;
 using System.Text;
 
@@ -69,14 +73,16 @@ namespace AspWebApiGlebTest
 			});
 
 			var connectionString = builder.Configuration.GetConnectionString("Default");
-			#region EF Core 
 
-			builder.Services.AddScoped<IContactRepository, ContactRepositoryEFCore>();
-			builder.Services.AddScoped<IUserRepository, UserRepositoryEFCore>();
-			builder.Services.AddDbContext<ContactsDbContext>(options =>
-			{
-				options.UseSqlServer(connectionString);
-			});
+			#region Dapper 
+			builder.Services.AddScoped<IContactRepository, ContactRepositoryDapper>(provider => new ContactRepositoryDapper(connectionString!));
+			builder.Services.AddScoped<IUserRepository, UserRepositoryDapper>(provider => new UserRepositoryDapper(connectionString!));
+			#endregion
+
+			#region EF Core 
+			//builder.Services.AddScoped<IContactRepository, ContactRepositoryEFCore>();
+			//builder.Services.AddScoped<IUserRepository, UserRepositoryEFCore>();
+			//builder.Services.AddDbContext<ContactsDbContext>(options => options.UseSqlServer(connectionString));
 			#endregion
 
 

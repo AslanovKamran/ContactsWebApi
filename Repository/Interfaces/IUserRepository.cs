@@ -1,6 +1,6 @@
 ﻿using AspWebApiGlebTest.Models;
 
-namespace AspWebApiGlebTest.Repository.cs
+namespace AspWebApiGlebTest.Repository.Interfaces
 {
 	public interface IUserRepository
 	{

@@ -1,5 +1,6 @@
-﻿using AspWebApiGlebTest.Models.DTOs;
-using AspWebApiGlebTest.Repository.cs;
+﻿using AspWebApiGlebTest.Models;
+using AspWebApiGlebTest.Models.DTOs;
+using AspWebApiGlebTest.Repository.Interfaces;
 using AspWebApiGlebTest.Tokens;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -37,6 +38,33 @@ namespace AspWebApiGlebTest.Controllers
 				return Ok(new { AccessToken = _tokenGenerator.GenerateToken(user) });
 			}
 			return BadRequest("Wrong login or password");
+		}
+
+
+		/// <summary>
+		/// Register a New User and Get an Access Token with Inserted User Data
+		/// </summary>
+		/// <param name="userDTO">Valid Credentials</param>
+		/// <returns>New User</returns>
+
+		[HttpPost]
+		[Route("register")]
+		[ProducesResponseType(201)]
+		[ProducesResponseType(400)]
+		public async Task<IActionResult> Register(PostUserDTO userDTO)
+		{
+			if (ModelState.IsValid)
+			{
+				User user = new User
+				{
+					Login = userDTO.Login,
+					Password = userDTO.Password,
+					RoleId = userDTO.RoleId
+				};
+				user = await _userRepository.AddUserAsync(user);
+				return Ok(new { AccessToken = _tokenGenerator.GenerateToken(user), User = user });
+			}
+			return BadRequest(ModelState);
 		}
 	}
 }

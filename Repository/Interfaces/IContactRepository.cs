@@ -1,6 +1,6 @@
 ﻿using AspWebApiGlebTest.Models;
 
-namespace AspWebApiGlebTest.Repository.cs
+namespace AspWebApiGlebTest.Repository.Interfaces
 {
 	public interface IContactRepository
 	{
@@ -11,6 +11,6 @@ namespace AspWebApiGlebTest.Repository.cs
 		Task<Contact> UpdateContactAsync(Contact contact);
 		Task DeleteContactAsync(int id);
 
-	
+
 	}
 }
