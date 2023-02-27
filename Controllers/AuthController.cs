@@ -30,14 +30,22 @@ namespace AspWebApiGlebTest.Controllers
 		[Route("login")]
 		[ProducesResponseType(200)]
 		[ProducesResponseType(400)]
-		public async Task<IActionResult> Login(LoginRequest request)
+		public async Task<IActionResult> Login([FromForm]LoginRequest request)
 		{
-			var user = await _userRepository.AuthenticateUserAsync(request.Login, request.Password);
-			if (user is not null)
+			try
 			{
-				return Ok(new { AccessToken = _tokenGenerator.GenerateToken(user) });
+				var user = await _userRepository.LogInUserAsync(request.Login, request.Password);
+				if (user is not null)
+				{
+					return Ok(new { AccessToken = _tokenGenerator.GenerateToken(user) });
+				}
+				return BadRequest("Wrong login or password");
 			}
-			return BadRequest("Wrong login or password");
+			catch (Exception ex)
+			{
+				return BadRequest(ex.Message);
+			}
+
 		}
 
 
@@ -51,7 +59,7 @@ namespace AspWebApiGlebTest.Controllers
 		[Route("register")]
 		[ProducesResponseType(201)]
 		[ProducesResponseType(400)]
-		public async Task<IActionResult> Register(PostUserDTO userDTO)
+		public async Task<IActionResult> Register([FromForm] PostUserDTO userDTO)
 		{
 			if (ModelState.IsValid)
 			{
@@ -61,8 +69,16 @@ namespace AspWebApiGlebTest.Controllers
 					Password = userDTO.Password,
 					RoleId = userDTO.RoleId
 				};
-				user = await _userRepository.AddUserAsync(user);
-				return Ok(new { AccessToken = _tokenGenerator.GenerateToken(user), User = user });
+				try
+				{
+					user = await _userRepository.RegisterUserAsync(user);
+					return Ok(new { AccessToken = _tokenGenerator.GenerateToken(user), User = user });
+				}
+				catch (Exception ex)
+				{
+					return BadRequest(ex.Message);
+				}
+
 			}
 			return BadRequest(ModelState);
 		}

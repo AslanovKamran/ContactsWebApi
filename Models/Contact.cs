@@ -8,20 +8,20 @@ namespace AspWebApiGlebTest.Models
 		public int Id { get; set; }
 
 		[Required]
-		[MaxLength(100) ]
+		[MaxLength(100)]
 		public string Name { get; set; } = string.Empty;
-		
+
 		[Required]
-		[MaxLength(100) ]
-		public string Surname{ get; set; } = string.Empty;
-		
+		[MaxLength(100)]
+		public string Surname { get; set; } = string.Empty;
+
 		[Phone]
 		public string? Phone { get; set; }
 
 		[Required]
 		[EmailAddress]
-		public string Email{ get; set; } = string.Empty;
-		
+		public string Email { get; set; } = string.Empty;
+
 		public bool? IsFavorite { get; set; }
 
 		public Contact(int id, string name, string surname, string phone, string email, bool isFavorite)
@@ -33,6 +33,6 @@ namespace AspWebApiGlebTest.Models
 			Email = email;
 			IsFavorite = isFavorite;
 		}
-		public Contact(){}
+		public Contact() { }
 	}
 }

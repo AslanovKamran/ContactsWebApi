@@ -1,4 +1,5 @@
-﻿using AspWebApiGlebTest.Models;
+﻿using AspWebApiGlebTest.Helpers;
+using AspWebApiGlebTest.Models;
 using AspWebApiGlebTest.Repository.Interfaces;
 using Dapper;
 using Microsoft.Data.SqlClient;
@@ -46,17 +47,22 @@ namespace AspWebApiGlebTest.Repository.Dapper
 			}
 		}
 
-		public async Task<User> AddUserAsync(User user)
+		public async Task<User> RegisterUserAsync(User user)
 		{
+			user.Salt = Guid.NewGuid().ToString();
+			user.Password = Hasher.HashPassword($"{user.Password}{user.Salt}");
+
 			using (IDbConnection db = new SqlConnection(_connectionString))
 			{
 				
 				var parameters = new DynamicParameters();
+
 				parameters.Add("Login", user.Login, DbType.String, ParameterDirection.Input);
 				parameters.Add("Password", user.Password, DbType.String, ParameterDirection.Input);
 				parameters.Add("RoleId", user.RoleId, DbType.String, ParameterDirection.Input);
+				parameters.Add("Salt", user.Salt, DbType.String, ParameterDirection.Input);
 
-				string query = @"exec AddUser @Login, @Password,@RoleId";
+				string query = @"exec AddUser @Login, @Password,@RoleId, @Salt";
 
 				var insertedUserId = await db.QuerySingleAsync<int>(query, parameters);
 
@@ -66,22 +72,26 @@ namespace AspWebApiGlebTest.Repository.Dapper
 			}
 		}
 
-		public async Task<User> AuthenticateUserAsync(string login, string password)
+		public async Task<User> LogInUserAsync(string login, string password)
 		{
 			using (IDbConnection db = new SqlConnection(_connectionString))
 			{
 
 				var parameters = new DynamicParameters();
 				parameters.Add("Login", login, DbType.String, ParameterDirection.Input);
-				parameters.Add("Password", password, DbType.String, ParameterDirection.Input);
+				
 
-				string query = @"exec AuthorizeUser @Login = @login, @Password = @password";
-				var user = (await db.QueryAsync<User, Role, User>(query, (user, role) =>
+				string query = @"exec GetUserByLogin @Login";
+				var loggedInUser = (await db.QueryAsync<User, Role, User>(query, (user, role) =>
 				{
 					user.Role = role;
 					return user;
 				}, parameters)).FirstOrDefault();
-				return user!;
+				if (loggedInUser != null && Hasher.HashPassword($"{password}{loggedInUser.Salt}") == loggedInUser.Password)
+				{
+					return loggedInUser;
+				}
+				else return null!;
 			}
 		}
 

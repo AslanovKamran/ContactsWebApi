@@ -17,6 +17,7 @@ namespace AspWebApiGlebTest.Tokens
 			var claims = new List<Claim>();
 			claims.Add(new Claim("name", user.Login));
 			claims.Add(new Claim("role", user.Role.Name));
+			claims.Add(new Claim("iat", DateTime.Now.Ticks.ToString()));
 
 			//Generating Credentials
 			var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));

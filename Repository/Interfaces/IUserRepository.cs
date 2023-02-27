@@ -6,8 +6,8 @@ namespace AspWebApiGlebTest.Repository.Interfaces
 	{
 		Task<IEnumerable<User>> GetUsersAsync();
 		Task<User> GetUserAsync(int id);
-		Task<User> AddUserAsync(User user);
+		Task<User> RegisterUserAsync(User user);
 
-		Task<User> AuthenticateUserAsync(string login, string password);
+		Task<User> LogInUserAsync(string login, string password);
 	}
 }

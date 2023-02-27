@@ -18,6 +18,10 @@ namespace AspWebApiGlebTest.Models
 		[Required]
 		public int RoleId { get; set; }
 
+		[Required]
+		[MaxLength(255)]
+		public string Salt { get; set; } = string.Empty;
+
 
 		//Nav Property
 		public Role Role { get; set; }
