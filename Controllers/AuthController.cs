@@ -30,7 +30,7 @@ namespace AspWebApiGlebTest.Controllers
 		[Route("login")]
 		[ProducesResponseType(200)]
 		[ProducesResponseType(400)]
-		public async Task<IActionResult> Login([FromForm]LoginRequest request)
+		public async Task<IActionResult> Login([FromForm] LoginRequest request)
 		{
 			try
 			{
@@ -72,11 +72,11 @@ namespace AspWebApiGlebTest.Controllers
 				try
 				{
 					user = await _userRepository.RegisterUserAsync(user);
-					return Ok(new { AccessToken = _tokenGenerator.GenerateToken(user), User = user });
+					return Ok(new { AccessToken = _tokenGenerator.GenerateToken(user), User = new { user.Id, user.Login, Role = user.Role.Name } });
 				}
 				catch (Exception ex)
 				{
-					return BadRequest(ex.Message);
+					return BadRequest(new { Error = ex.Message });
 				}
 
 			}

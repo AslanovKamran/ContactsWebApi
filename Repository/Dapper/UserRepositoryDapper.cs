@@ -49,6 +49,13 @@ namespace AspWebApiGlebTest.Repository.Dapper
 
 		public async Task<User> RegisterUserAsync(User user)
 		{
+			//Validate Login matching
+			var users = await GetUsersAsync();
+			if (users.Any(x => x.Login.ToLower() == user.Login.ToLower()))
+			{
+				throw new Exception("This login is occupied, try another one");
+			}
+
 			user.Salt = Guid.NewGuid().ToString();
 			user.Password = Hasher.HashPassword($"{user.Password}{user.Salt}");
 
