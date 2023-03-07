@@ -56,7 +56,19 @@ namespace AspWebApiGlebTest
 
 				#endregion
 			});
-			builder.Services.AddSingleton<ITokenGenerator, TokenGenerator>();
+
+
+			//Add JwtOptions as Singleton
+			var jwtOptions = builder.Configuration.GetSection("Jwt");
+			var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions["Key"]!));
+			builder.Services.Configure<JwtOptions>(options =>
+			{
+				options.Issuer = jwtOptions["Issuer"]!;
+				options.Audience = jwtOptions["Audience"]!;
+				options.AccessValidFor = TimeSpan.FromMinutes(10);
+				options.SigningCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+			});
+
 			builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 			{
 				options.TokenValidationParameters = new TokenValidationParameters
@@ -84,6 +96,8 @@ namespace AspWebApiGlebTest
 			//builder.Services.AddScoped<IUserRepository, UserRepositoryEFCore>();
 			//builder.Services.AddDbContext<ContactsDbContext>(options => options.UseSqlServer(connectionString));
 			#endregion
+
+			builder.Services.AddSingleton<ITokenGenerator, TokenGenerator>();
 
 
 			var app = builder.Build();

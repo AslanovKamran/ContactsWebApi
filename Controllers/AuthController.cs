@@ -72,7 +72,7 @@ namespace AspWebApiGlebTest.Controllers
 				try
 				{
 					user = await _userRepository.RegisterUserAsync(user);
-					return Ok(new { AccessToken = _tokenGenerator.GenerateToken(user), User = new { user.Id, user.Login, Role = user.Role.Name } });
+					return Ok( new { user.Id, user.Login, Role = user.Role.Name });
 				}
 				catch (Exception ex)
 				{

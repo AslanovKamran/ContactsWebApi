@@ -1,4 +1,5 @@
 ﻿using AspWebApiGlebTest.Models;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -8,31 +9,41 @@ namespace AspWebApiGlebTest.Tokens
 {
 	public class TokenGenerator : ITokenGenerator
 	{
-		private readonly IConfiguration _config;
-		public TokenGenerator(IConfiguration config) => _config = config;
+		private readonly JwtOptions _options;
+		public TokenGenerator(IOptions<JwtOptions> options) => _options = options.Value;
 
 		public string GenerateToken(User user)
 		{
+			var issuedAt = DateTime.Now;
+
 			//Generating Claims
 			var claims = new List<Claim>();
-			claims.Add(new Claim("name", user.Login));
+
+			claims.Add(new Claim("id", user.Id.ToString()));
+			claims.Add(new Claim("sub", user.Login));
 			claims.Add(new Claim("role", user.Role.Name));
-			
+			claims.Add(new Claim("iat", ToUnixEpochDate(DateTime.Now).ToString(), ClaimValueTypes.Integer64));
+
 
 			//Generating Credentials
-			var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
-			var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+			
 
 			//Generating token
 			var token = new JwtSecurityToken(
-				_config["Jwt:Issuer"],
-				_config["Jwt:Audience"],
+				issuer: _options.Issuer,
+				audience: _options.Audience,
 				claims,
-				expires: DateTime.Now.AddMinutes(15),
-				signingCredentials: creds
+				expires: issuedAt + _options.AccessValidFor,
+				signingCredentials: _options.SigningCredentials
 				);
 			return new JwtSecurityTokenHandler().WriteToken(token);
+		}
+		public string GenerateRefreshToken() => Guid.NewGuid().ToString();
 
+		private static long ToUnixEpochDate(DateTime date)
+		{
+			var offset = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
+			return (long)Math.Round((date.ToUniversalTime() - offset).TotalSeconds);
 		}
 	}
 }

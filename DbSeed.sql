@@ -36,8 +36,8 @@
 --[Id] INT PRIMARY KEY IDENTITY,
 --[Name] NVARCHAR(100) NOT NULL,
 --[Surname] NVARCHAR(100) NOT NULL,
---[Phone] NVARCHAR,
---[Email] NVARCHAR NOT NULL,
+--[Phone] NVARCHAR(255),
+--[Email] NVARCHAR(255) NOT NULL,
 --[IsFavorite] BIT
 --)
 
