@@ -1,11 +1,9 @@
-using AspWebApiGlebTest.Models;
-using AspWebApiGlebTest.Repository;
 using AspWebApiGlebTest.Repository.Dapper;
 using AspWebApiGlebTest.Repository.Interfaces;
 using AspWebApiGlebTest.Tokens;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
+
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
@@ -58,17 +56,20 @@ namespace AspWebApiGlebTest
 			});
 
 
-			//Add JwtOptions as Singleton
+			#region Jwt Options
 			var jwtOptions = builder.Configuration.GetSection("Jwt");
 			var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions["Key"]!));
 			builder.Services.Configure<JwtOptions>(options =>
 			{
 				options.Issuer = jwtOptions["Issuer"]!;
 				options.Audience = jwtOptions["Audience"]!;
-				options.AccessValidFor = TimeSpan.FromMinutes(10);
+				options.AccessValidFor = TimeSpan.FromMinutes(1);
+				options.RefreshValidFor = TimeSpan.FromDays(30);
 				options.SigningCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 			});
+			#endregion
 
+			#region Authentication
 			builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 			{
 				options.TokenValidationParameters = new TokenValidationParameters
@@ -80,27 +81,26 @@ namespace AspWebApiGlebTest
 
 					ValidIssuer = builder.Configuration["Jwt:Issuer"],
 					ValidAudience = builder.Configuration["Jwt:Audience"],
-					IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+					IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
+					
+					ClockSkew = TimeSpan.Zero // Removes default additional time to the tokens
 				};
 			});
-
-			var connectionString = builder.Configuration.GetConnectionString("Default");
-
-			#region Dapper 
-			builder.Services.AddScoped<IContactRepository, ContactRepositoryDapper>(provider => new ContactRepositoryDapper(connectionString!));
-			builder.Services.AddScoped<IUserRepository, UserRepositoryDapper>(provider => new UserRepositoryDapper(connectionString!));
 			#endregion
 
-			#region EF Core 
-			//builder.Services.AddScoped<IContactRepository, ContactRepositoryEFCore>();
-			//builder.Services.AddScoped<IUserRepository, UserRepositoryEFCore>();
-			//builder.Services.AddDbContext<ContactsDbContext>(options => options.UseSqlServer(connectionString));
+
+			#region Dapper 
+			var connectionString = builder.Configuration.GetConnectionString("Default");
+			
+			builder.Services.AddScoped<IContactRepository, ContactRepositoryDapper>(provider => new ContactRepositoryDapper(connectionString!));
+			builder.Services.AddScoped<IUserRepository, UserRepositoryDapper>(provider => new UserRepositoryDapper(connectionString!));
 			#endregion
 
 			builder.Services.AddSingleton<ITokenGenerator, TokenGenerator>();
 
 
 			var app = builder.Build();
+
 			app.UseSwagger();
 			app.UseSwaggerUI();
 

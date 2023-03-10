@@ -41,6 +41,15 @@
 --[IsFavorite] BIT
 --)
 
+ --GO
+ --CREATE TABLE RefreshTokens
+ --(
+ --[Id] INT PRIMARY KEY IDENTITY,
+ --[Token] NVARCHAR(255) NOT NULL,
+ --[Expires] DATETIME NOT NULL,
+ --[UserId] INT REFERENCES Users(Id) NOT NULL 
+ --)
+
 
 ----STORED PROCEDURES
 
@@ -137,3 +146,43 @@
 --JOIN Roles as r ON r.Id = u.RoleId 
 --where u.Login = @Login COLLATE Latin1_General_CS_AS
 --END
+
+
+
+
+----Insert a new entity into RefreshTokens
+-- GO 
+-- CREATE PROC AddRefreshToken @Token NVARCHAR(255), @Expires DATETIME, @UserId INT
+-- AS
+-- BEGIN
+-- INSERT INTO RefreshTokens VALUES(@Token,@Expires, @UserId)
+-- END
+
+----Retrieve a specific entity by its id from the RefreshTokens, joined with Users and their Roles
+-- GO
+-- CREATE PROC GetRefresTokenByToken @Token NVARCHAR(255)
+-- AS
+-- BEGIN
+-- SELECT rt.*, us.*,rl.* FROM RefreshTokens AS rt
+-- JOIN Users AS us ON us.Id = rt.UserId
+-- JOIN Roles AS rl ON rl.Id = us.RoleId
+-- WHERE rt.Token = @Token
+-- END
+
+----Remove a specific entity from RefreshTokens by Token
+-- GO
+-- CREATE PROC RemoveOldRefreshToken @Token NVARCHAR(255)
+-- AS
+-- BEGIN
+-- DELETE FROM RefreshTokens WHERE RefreshTokens.Token = @Token
+-- END
+
+----Remove all User's RefreshTokens by their Id 
+--GO
+--CREATE PROC DeleteUserRefreshTokens @UserId INT
+--AS
+--BEGIN
+--DELETE FROM RefreshTokens WHERE UserId = @UserId
+--END
+
+

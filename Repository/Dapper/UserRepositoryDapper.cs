@@ -28,6 +28,7 @@ namespace AspWebApiGlebTest.Repository.Dapper
 			}
 		}
 
+		//Get a specific User by their Id
 		public async Task<User> GetUserAsync(int id)
 		{
 			using (IDbConnection db = new SqlConnection(_connectionString))
@@ -47,6 +48,7 @@ namespace AspWebApiGlebTest.Repository.Dapper
 			}
 		}
 
+		//Add new User to the Data Base
 		public async Task<User> RegisterUserAsync(User user)
 		{
 			//Validate Login matching
@@ -79,6 +81,7 @@ namespace AspWebApiGlebTest.Repository.Dapper
 			}
 		}
 
+		//Verify a User
 		public async Task<User> LogInUserAsync(string login, string password)
 		{
 			using (IDbConnection db = new SqlConnection(_connectionString))
@@ -102,8 +105,59 @@ namespace AspWebApiGlebTest.Repository.Dapper
 			}
 		}
 
+		//Add new RefreshToken to the Data Base
+		public async Task AddRefreshTokenAsync(RefreshToken refreshToken)
+		{
+			using (IDbConnection db = new SqlConnection(_connectionString))
+			{
+				string query = @"exec AddRefreshToken @Token, @Expires, @UserId";
+				await db.ExecuteAsync(query, refreshToken);
+			}
+		}
 
+		//Get a specific RefreshToken by Token
+		public async Task<RefreshToken> GetRefreshTokenByToken(string token)
+		{
+			using (IDbConnection db = new SqlConnection(_connectionString))
+			{
+				var parameters = new DynamicParameters();
+				parameters.Add("Token", token, DbType.String, ParameterDirection.Input);
 
+				string query = @"exec GetRefresTokenByToken @Token";
+				var result = (await db.QueryAsync<RefreshToken, User, Role, RefreshToken>(query, (refreshToken, user, role) =>
+				{
+					refreshToken.User = user;
+					user.Role = role;
+					return refreshToken;
+				}, parameters)).FirstOrDefault();
+				return result!;
+			}
+		}
 
+		//Remove old RefreshToken by Token from the Data Base
+		public async Task RemoveOldRefreshToken(string token)
+		{
+			using (IDbConnection db = new SqlConnection(_connectionString))
+			{
+				var parameters = new DynamicParameters();
+				parameters.Add("Token", token, DbType.String, ParameterDirection.Input);
+
+				string query = @"exec RemoveOldRefreshToken @Token";
+				await db.ExecuteAsync(query, parameters);
+			}
+		}
+
+		//Remove all Users Refresh Tokens (when Loggin out)
+		public async Task RemoveUsersRefreshTokens(int userId)
+		{
+			using (IDbConnection db = new SqlConnection(_connectionString))
+			{
+				var parameters = new DynamicParameters();
+				parameters.Add("UserId", userId, DbType.Int32, ParameterDirection.Input);
+
+				string query = @"exec DeleteUserRefreshTokens @UserId";
+				await db.ExecuteAsync(query, parameters);
+			}
+		}
 	}
 }
