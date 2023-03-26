@@ -3,7 +3,7 @@ using AspWebApiGlebTest.Repository.Interfaces;
 using AspWebApiGlebTest.Tokens;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-
+using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
@@ -17,7 +17,6 @@ namespace AspWebApiGlebTest
 		public static void Main(string[] args)
 		{
 			var builder = WebApplication.CreateBuilder(args);
-
 
 			builder.Services.AddControllers();
 			builder.Services.AddEndpointsApiExplorer();
@@ -55,16 +54,25 @@ namespace AspWebApiGlebTest
 				#endregion
 			});
 
+			builder.Services.AddHttpLogging(httpLogging =>
+			{
+				httpLogging.LoggingFields = HttpLoggingFields.All;
+			});
+
 
 			#region Jwt Options
 			var jwtOptions = builder.Configuration.GetSection("Jwt");
 			var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions["Key"]!));
+
+			const double AccessTokenLifeTime = 3;
+			const double RefreshokenLifeTime = 30;
+
 			builder.Services.Configure<JwtOptions>(options =>
 			{
 				options.Issuer = jwtOptions["Issuer"]!;
 				options.Audience = jwtOptions["Audience"]!;
-				options.AccessValidFor = TimeSpan.FromMinutes(1);
-				options.RefreshValidFor = TimeSpan.FromDays(30);
+				options.AccessValidFor = TimeSpan.FromMinutes(AccessTokenLifeTime);
+				options.RefreshValidFor = TimeSpan.FromDays(RefreshokenLifeTime);
 				options.SigningCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 			});
 			#endregion
@@ -88,7 +96,6 @@ namespace AspWebApiGlebTest
 			});
 			#endregion
 
-
 			#region Dapper 
 			var connectionString = builder.Configuration.GetConnectionString("Default");
 			
@@ -98,11 +105,12 @@ namespace AspWebApiGlebTest
 
 			builder.Services.AddSingleton<ITokenGenerator, TokenGenerator>();
 
-
 			var app = builder.Build();
 
 			app.UseSwagger();
 			app.UseSwaggerUI();
+
+			app.UseHttpLogging();
 
 			app.UseAuthentication();
 			app.UseAuthorization();

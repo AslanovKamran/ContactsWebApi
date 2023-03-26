@@ -60,12 +60,11 @@ namespace AspWebApiGlebTest.Controllers
 			{
 				return BadRequest(ex.Message);
 			}
-
 		}
 
 
 		/// <summary>
-		/// Register a New User and Get an Access Token with Inserted User Data
+		/// Register a New User and Get the User's Id, Login and Role
 		/// </summary>
 		/// <param name="userDTO">Valid Credentials</param>
 		/// <returns>New User</returns>
@@ -93,7 +92,6 @@ namespace AspWebApiGlebTest.Controllers
 				{
 					return BadRequest(new { Error = ex.Message });
 				}
-
 			}
 			return BadRequest(ModelState);
 		}
