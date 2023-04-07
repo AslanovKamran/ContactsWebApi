@@ -1,9 +1,12 @@
+using AspWebApiGlebTest.Data;
 using AspWebApiGlebTest.Repository.Dapper;
+using AspWebApiGlebTest.Repository.EFCore;
 using AspWebApiGlebTest.Repository.Interfaces;
 using AspWebApiGlebTest.Tokens;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpLogging;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
@@ -96,11 +99,22 @@ namespace AspWebApiGlebTest
 			});
 			#endregion
 
-			#region Dapper 
 			var connectionString = builder.Configuration.GetConnectionString("Default");
 			
-			builder.Services.AddScoped<IContactRepository, ContactRepositoryDapper>(provider => new ContactRepositoryDapper(connectionString!));
+			#region Dapper 
+			//builder.Services.AddScoped<IContactRepository, ContactRepositoryDapper>(provider => new ContactRepositoryDapper(connectionString!));
 			builder.Services.AddScoped<IUserRepository, UserRepositoryDapper>(provider => new UserRepositoryDapper(connectionString!));
+			#endregion
+
+			#region EF Core
+			builder.Services.AddDbContext<ContactsTestDbContext>(options => 
+			{
+				options.UseSqlServer(connectionString);
+			});
+
+			builder.Services.AddScoped<IContactRepository, ContactRepositoryEfCore>();
+			//builder.Services.AddScoped<IUserRepository, UserRepositoryDapper>(provider => new UserRepositoryDapper(connectionString!));
+
 			#endregion
 
 			builder.Services.AddSingleton<ITokenGenerator, TokenGenerator>();

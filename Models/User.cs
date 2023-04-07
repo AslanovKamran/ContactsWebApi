@@ -23,12 +23,9 @@ namespace AspWebApiGlebTest.Models
 		public string Salt { get; set; } = string.Empty;
 
 
-		//Nav Property
-		public Role Role { get; set; }
+		//Nav Properties 
+		public Role Role { get; set; } = new();
+		//public virtual ICollection<RefreshToken> RefreshTokens { get; } = new List<RefreshToken>();
 
-		public User()
-		{
-			this.Role = new();
-		}
 	}
 }

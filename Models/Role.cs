@@ -10,5 +10,7 @@ namespace AspWebApiGlebTest.Models
 		[Required(AllowEmptyStrings =false)]
 		[MaxLength(100)]
 		public string Name { get; set; } = string.Empty;
+
+		
 	}
 }
