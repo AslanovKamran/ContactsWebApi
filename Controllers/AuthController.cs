@@ -20,13 +20,12 @@ namespace AspWebApiGlebTest.Controllers
 			_userRepository = userRepository;
 		}
 
-
 		/// <summary>
 		///	Log In User and Get an Access Token
 		/// </summary>
 		/// <param name="request">Login and Password</param>
 		/// <returns></returns>
-
+		
 		[HttpPost]
 		[Route("login")]
 		[ProducesResponseType(200)]
@@ -38,6 +37,7 @@ namespace AspWebApiGlebTest.Controllers
 				var user = await _userRepository.LogInUserAsync(request.Login, request.Password);
 				if (user is not null)
 				{
+					
 					//Generate an Access Token
 					var accessToken = _tokenGenerator.GenerateToken(user);
 
@@ -48,6 +48,8 @@ namespace AspWebApiGlebTest.Controllers
 						UserId = user.Id,
 						Expires = DateTime.Now + TimeSpan.FromDays(30),
 					};
+
+				
 
 					//Add a new RefreshToken to the Data Base
 					await _userRepository.AddRefreshTokenAsync(refreshToken);
@@ -137,6 +139,7 @@ namespace AspWebApiGlebTest.Controllers
 			UserTokensDTO tokens = new(newAccessToken, newRefreshToken.Token);
 			return Ok(tokens);
 		}
+
 
 		/// <summary>
 		/// Log out a User (Delete all their Refresh Tokens from the Database)

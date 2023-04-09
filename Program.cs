@@ -103,7 +103,7 @@ namespace AspWebApiGlebTest
 			
 			#region Dapper 
 			//builder.Services.AddScoped<IContactRepository, ContactRepositoryDapper>(provider => new ContactRepositoryDapper(connectionString!));
-			builder.Services.AddScoped<IUserRepository, UserRepositoryDapper>(provider => new UserRepositoryDapper(connectionString!));
+			//builder.Services.AddScoped<IUserRepository, UserRepositoryDapper>(provider => new UserRepositoryDapper(connectionString!));
 			#endregion
 
 			#region EF Core
@@ -113,7 +113,7 @@ namespace AspWebApiGlebTest
 			});
 
 			builder.Services.AddScoped<IContactRepository, ContactRepositoryEfCore>();
-			//builder.Services.AddScoped<IUserRepository, UserRepositoryDapper>(provider => new UserRepositoryDapper(connectionString!));
+			builder.Services.AddScoped<IUserRepository, UserRepositoryEfCore>();
 
 			#endregion
 
