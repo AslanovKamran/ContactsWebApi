@@ -1,4 +1,4 @@
-﻿using AspWebApiGlebTest.Models;
+﻿using AspWebApiGlebTest.Models.Domain;
 
 namespace AspWebApiGlebTest.Tokens
 {

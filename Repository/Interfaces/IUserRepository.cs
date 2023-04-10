@@ -1,4 +1,4 @@
-﻿using AspWebApiGlebTest.Models;
+﻿using AspWebApiGlebTest.Models.Domain;
 
 namespace AspWebApiGlebTest.Repository.Interfaces
 {
@@ -14,5 +14,7 @@ namespace AspWebApiGlebTest.Repository.Interfaces
 		Task<RefreshToken> GetRefreshTokenByToken(string token);
 		Task RemoveOldRefreshToken(string token);
 		Task RemoveUsersRefreshTokens(int userId);
+
+		Task ChangePasswordAsync(string login, string oldPassword, string newPassword);
 	}
 }

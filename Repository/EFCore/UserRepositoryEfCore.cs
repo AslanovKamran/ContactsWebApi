@@ -1,6 +1,6 @@
 ﻿using AspWebApiGlebTest.Data;
 using AspWebApiGlebTest.Helpers;
-using AspWebApiGlebTest.Models;
+using AspWebApiGlebTest.Models.Domain;
 using AspWebApiGlebTest.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -101,6 +101,19 @@ namespace AspWebApiGlebTest.Repository.EFCore
 		{
 			var tokens = _dbContext.RefreshTokens.Where(x => x.UserId == userId);
 			_dbContext.RemoveRange(tokens);
+			await _dbContext.SaveChangesAsync();
+
+		}
+
+		//Change a User Password based on their old credentials
+		public async Task ChangePasswordAsync(string login, string oldPassword, string newPassword)
+		{
+			var user = await LogInUserAsync(login, oldPassword);
+			if(user == null) throw new Exception("Wrong user creds");
+
+			newPassword = Hasher.HashPassword($"{newPassword}{user.Salt}");
+			user.Password = newPassword;
+			_dbContext.Users.Update(user);
 			await _dbContext.SaveChangesAsync();
 
 		}

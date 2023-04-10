@@ -1,4 +1,4 @@
-﻿using AspWebApiGlebTest.Models;
+﻿using AspWebApiGlebTest.Models.Domain;
 using AspWebApiGlebTest.Repository.Interfaces;
 using Dapper;
 using Microsoft.Data.SqlClient;

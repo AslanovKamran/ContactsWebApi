@@ -1,5 +1,5 @@
 ﻿using AspWebApiGlebTest.Data;
-using AspWebApiGlebTest.Models;
+using AspWebApiGlebTest.Models.Domain;
 using AspWebApiGlebTest.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 

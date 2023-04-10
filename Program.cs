@@ -97,17 +97,17 @@ namespace AspWebApiGlebTest
 					ClockSkew = TimeSpan.Zero // Removes default additional time to the tokens
 				};
 			});
-			#endregion
-
-			var connectionString = builder.Configuration.GetConnectionString("Default");
+			#endregion 
 			
+			var connectionString = builder.Configuration.GetConnectionString("Default");
+
 			#region Dapper 
 			//builder.Services.AddScoped<IContactRepository, ContactRepositoryDapper>(provider => new ContactRepositoryDapper(connectionString!));
 			//builder.Services.AddScoped<IUserRepository, UserRepositoryDapper>(provider => new UserRepositoryDapper(connectionString!));
 			#endregion
 
 			#region EF Core
-			builder.Services.AddDbContext<ContactsTestDbContext>(options => 
+			builder.Services.AddDbContext<ContactsTestDbContext>(options =>
 			{
 				options.UseSqlServer(connectionString);
 			});

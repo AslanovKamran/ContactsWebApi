@@ -1,5 +1,5 @@
 ﻿using AspWebApiGlebTest.Helpers;
-using AspWebApiGlebTest.Models;
+using AspWebApiGlebTest.Models.Domain;
 using AspWebApiGlebTest.Repository.Interfaces;
 using Dapper;
 using Microsoft.Data.SqlClient;
@@ -42,7 +42,7 @@ namespace AspWebApiGlebTest.Repository.Dapper
 				{
 					user.Role = role;
 					return user;
-				},parameters)).FirstOrDefault();
+				}, parameters)).FirstOrDefault();
 
 				return user!;
 			}
@@ -63,7 +63,7 @@ namespace AspWebApiGlebTest.Repository.Dapper
 
 			using (IDbConnection db = new SqlConnection(_connectionString))
 			{
-				
+
 				var parameters = new DynamicParameters();
 
 				parameters.Add("Login", user.Login, DbType.String, ParameterDirection.Input);
@@ -89,7 +89,7 @@ namespace AspWebApiGlebTest.Repository.Dapper
 
 				var parameters = new DynamicParameters();
 				parameters.Add("Login", login, DbType.String, ParameterDirection.Input);
-				
+
 
 				string query = @"exec GetUserByLogin @Login";
 				var loggedInUser = (await db.QueryAsync<User, Role, User>(query, (user, role) =>
@@ -158,6 +158,27 @@ namespace AspWebApiGlebTest.Repository.Dapper
 				string query = @"exec DeleteUserRefreshTokens @UserId";
 				await db.ExecuteAsync(query, parameters);
 			}
+		}
+
+		//Change a User Password based on their old credentials
+		public async Task ChangePasswordAsync(string login, string oldPassword, string newPassword)
+		{
+			var user = await LogInUserAsync(login, oldPassword);
+
+			if (user == null) throw new Exception("Wrong user creds");
+
+			newPassword = Hasher.HashPassword($"{newPassword}{user.Salt}");
+
+			using (IDbConnection db = new SqlConnection(_connectionString))
+			{
+				var parameters = new DynamicParameters();
+				parameters.Add("Login", login, DbType.String, ParameterDirection.Input);
+				parameters.Add("Password", newPassword, DbType.String, ParameterDirection.Input);
+
+				string query = @"exec  ChangeUserPassword @Login, @Password";
+				await db.ExecuteAsync(query, parameters);
+			}
+
 		}
 	}
 }

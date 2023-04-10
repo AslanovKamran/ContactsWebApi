@@ -1,5 +1,6 @@
-﻿using AspWebApiGlebTest.Models;
+﻿using AspWebApiGlebTest.Models.Domain;
 using AspWebApiGlebTest.Models.DTOs;
+using AspWebApiGlebTest.Models.Requests;
 using AspWebApiGlebTest.Repository.Interfaces;
 using AspWebApiGlebTest.Tokens;
 using Microsoft.AspNetCore.Http;
@@ -25,7 +26,7 @@ namespace AspWebApiGlebTest.Controllers
 		/// </summary>
 		/// <param name="request">Login and Password</param>
 		/// <returns></returns>
-		
+
 		[HttpPost]
 		[Route("login")]
 		[ProducesResponseType(200)]
@@ -37,7 +38,7 @@ namespace AspWebApiGlebTest.Controllers
 				var user = await _userRepository.LogInUserAsync(request.Login, request.Password);
 				if (user is not null)
 				{
-					
+
 					//Generate an Access Token
 					var accessToken = _tokenGenerator.GenerateToken(user);
 
@@ -49,18 +50,18 @@ namespace AspWebApiGlebTest.Controllers
 						Expires = DateTime.Now + TimeSpan.FromDays(30),
 					};
 
-				
+
 
 					//Add a new RefreshToken to the Data Base
 					await _userRepository.AddRefreshTokenAsync(refreshToken);
 					UserTokensDTO userTokens = new(accessToken, refreshToken.Token);
 					return Ok(userTokens);
 				}
-				return BadRequest("Wrong login or password");
+				return BadRequest(new { LoginFailure = "Wrong login or password" });
 			}
 			catch (Exception ex)
 			{
-				return BadRequest(ex.Message);
+				return BadRequest(new { Error = ex.Message });
 			}
 		}
 
@@ -154,7 +155,7 @@ namespace AspWebApiGlebTest.Controllers
 		public async Task<IActionResult> LogOut(LogOutRequest request)
 		{
 			var token = await _userRepository.GetRefreshTokenByToken(request.RefreshToken);
-			
+
 			if (token == null || token.User.Login != request.Login)
 			{
 				return BadRequest(new { LogOutFailure = "Invalid Login or Refresh Token" });
@@ -162,6 +163,35 @@ namespace AspWebApiGlebTest.Controllers
 
 			await _userRepository.RemoveUsersRefreshTokens(token.UserId);
 			return Ok(new { Result = "Logged out Successfully" });
+		}
+
+
+		/// <summary>
+		/// Change a User Password (Type in old credentials and a new password)
+		/// </summary>
+		/// <param name="request"></param>
+		/// <returns></returns>
+
+		[HttpPost]
+		[Route("changePassword")]
+		[ProducesResponseType(200)]
+		[ProducesResponseType(404)]
+		public async Task<IActionResult> ChangePassword([FromForm] ChangePasswordRequest request)
+		{
+			if (ModelState.IsValid)
+			{
+				try
+				{
+					await _userRepository.ChangePasswordAsync(request.Login, request.OldPassword, request.NewPassword);
+					return Ok(new { Result = "Password has been changed successfully" });
+				}
+				catch (Exception ex)
+				{
+					return BadRequest(new { LoginFailure = ex.Message });
+				}
+
+			}
+			return BadRequest(ModelState);
 		}
 	}
 }

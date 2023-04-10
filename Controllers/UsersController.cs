@@ -1,6 +1,4 @@
-﻿using AspWebApiGlebTest.Models;
-using AspWebApiGlebTest.Models.DTOs;
-using AspWebApiGlebTest.Repository.Interfaces;
+﻿using AspWebApiGlebTest.Repository.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,7 +21,7 @@ namespace AspWebApiGlebTest.Controllers
 		[ProducesResponseType(200)]
 		[ProducesResponseType(401)]
 		[ProducesResponseType(403)]
-		//[Authorize(Roles = "Admin")]
+		[Authorize(Roles = "Admin")]
 		public async Task<IActionResult> GetUsers()
 		{
 			var users = await _repos.GetUsersAsync();
@@ -43,12 +41,11 @@ namespace AspWebApiGlebTest.Controllers
 		[ProducesResponseType(401)]
 		[ProducesResponseType(403)]
 		[ProducesResponseType(404)]
-		//[Authorize(Roles = "Admin")]
+		[Authorize(Roles = "Admin")]
 		public async Task<IActionResult> GetUser(int id)
 		{
 			var user = await _repos.GetUserAsync(id);
 			return user == null ? NotFound("No Such A User") : Ok(user);
 		}
-
 	}
 }

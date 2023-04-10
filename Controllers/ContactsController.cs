@@ -1,4 +1,4 @@
-﻿using AspWebApiGlebTest.Models;
+﻿using AspWebApiGlebTest.Models.Domain;
 using AspWebApiGlebTest.Models.DTOs;
 using AspWebApiGlebTest.Repository.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -16,7 +16,6 @@ namespace AspWebApiGlebTest.Controllers
 		private readonly IContactRepository _repos;
 		public ContactsController(IContactRepository repos) => _repos = repos;
 
-
 		/// <summary>
 		/// Gets A List Of Contacts
 		/// </summary>
@@ -25,7 +24,7 @@ namespace AspWebApiGlebTest.Controllers
 		[HttpGet]
 		[ProducesResponseType(200)]
 		[ProducesResponseType(401)]
-		//[Authorize(Roles ="User,Admin")]
+		[Authorize(Roles ="User,Admin")]
 		public async Task<IActionResult> GetCotacts()
 		{
 			var contacts = await _repos.GetContactsAsync();
@@ -43,7 +42,7 @@ namespace AspWebApiGlebTest.Controllers
 		[ProducesResponseType(200)]
 		[ProducesResponseType(401)]
 		[ProducesResponseType(404)]
-		//[Authorize(Roles = "User,Admin")]
+		[Authorize(Roles = "User,Admin")]
 		public async Task<IActionResult> GetContact(int id)
 		{
 			var contact = await _repos.GetContactAsync(id);
@@ -61,7 +60,7 @@ namespace AspWebApiGlebTest.Controllers
 		[ProducesResponseType(400)]
 		[ProducesResponseType(401)]
 		[ProducesResponseType(403)]
-		//[Authorize(Roles = "Admin")]
+		[Authorize(Roles = "Admin")]
 		public async Task<IActionResult> PostContact(PostContactDTO contactDTO)
 		{
 
@@ -93,7 +92,7 @@ namespace AspWebApiGlebTest.Controllers
 		[ProducesResponseType(401)]
 		[ProducesResponseType(403)]
 		[ProducesResponseType(404)]
-		//[Authorize(Roles = "Admin")]
+		[Authorize(Roles = "Admin")]
 		public async Task<IActionResult> PutContact(Contact contact)
 		{
 			if (ModelState.IsValid)
@@ -124,7 +123,7 @@ namespace AspWebApiGlebTest.Controllers
 		[ProducesResponseType(401)]
 		[ProducesResponseType(403)]
 		[ProducesResponseType(404)]
-		//[Authorize(Roles = "Admin")]
+		[Authorize(Roles = "Admin")]
 		public async Task<IActionResult> DeleteContact(int id)
 		{
 			var contact = await _repos.GetContactAsync(id);
@@ -135,7 +134,5 @@ namespace AspWebApiGlebTest.Controllers
 			}
 			return NotFound();
 		}
-
 	}
-
 }

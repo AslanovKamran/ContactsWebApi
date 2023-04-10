@@ -1,17 +1,17 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace AspWebApiGlebTest.Models
+namespace AspWebApiGlebTest.Models.Domain
 {
 	public class User
 	{
 		[Key]
 		public int Id { get; set; }
 
-		[Required(AllowEmptyStrings =false)]
+		[Required(AllowEmptyStrings = false)]
 		[MaxLength(100)]
 		public string Login { get; set; } = string.Empty;
 
-		[Required(AllowEmptyStrings =false)]
+		[Required(AllowEmptyStrings = false)]
 		[MaxLength(100)]
 		public string Password { get; set; } = string.Empty;
 

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using AspWebApiGlebTest.Models;
+using AspWebApiGlebTest.Models.Domain;
 using Microsoft.EntityFrameworkCore;
 
 namespace AspWebApiGlebTest.Data;

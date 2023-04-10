@@ -1,4 +1,4 @@
-﻿namespace AspWebApiGlebTest.Models
+﻿namespace AspWebApiGlebTest.Models.Domain
 {
 	public class RefreshToken
 	{

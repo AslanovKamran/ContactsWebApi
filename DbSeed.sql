@@ -185,4 +185,13 @@
 --DELETE FROM RefreshTokens WHERE UserId = @UserId
 --END
 
+--Change a User Password by their Login 
+--GO
+--CREATE PROC  ChangeUserPassword @Login NVARCHAR(100), @Password NVARCHAR(100)
+--AS
+--BEGIN
+--UPDATE [Users] SET [Users].Password = @Password WHERE
+--[Users].Login= @Login COLLATE Latin1_General_CS_AS
+--END
+
 

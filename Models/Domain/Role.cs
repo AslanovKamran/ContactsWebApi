@@ -1,16 +1,16 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace AspWebApiGlebTest.Models
+namespace AspWebApiGlebTest.Models.Domain
 {
 	public class Role
 	{
 		[Key]
 		public int Id { get; set; }
 
-		[Required(AllowEmptyStrings =false)]
+		[Required(AllowEmptyStrings = false)]
 		[MaxLength(100)]
 		public string Name { get; set; } = string.Empty;
 
-		
+
 	}
 }

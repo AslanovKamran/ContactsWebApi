@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace AspWebApiGlebTest.Models
+namespace AspWebApiGlebTest.Models.Domain
 {
 	public class Contact
 	{

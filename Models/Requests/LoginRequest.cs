@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace AspWebApiGlebTest.Models.DTOs
+namespace AspWebApiGlebTest.Models.Requests
 {
 	public class LoginRequest
 	{
