@@ -74,6 +74,26 @@
 --SELECT * FROM Contacts
 --END
 
+----Retrieve paginated entities from the Contacts
+--GO
+--CREATE PROC GetAllContactsPaginates  @Skip INT, @Take INT
+--AS
+--BEGIN
+--SELECT * FROM Contacts
+--ORDER BY Contacts.Id
+--OFFSET @Skip ROWS
+--FETCH NEXT @Take ROWS ONLY
+--END
+
+----Get Contacts Count
+--GO
+--CREATE PROC GetContactsCount
+--AS
+--BEGIN
+--SELECT COUNT(*) FROM Contacts
+--END
+
+
 ----Retrieve specific entity from the Contacts by its Id
 --GO
 --CREATE PROC GetSingleContact @Id INT 

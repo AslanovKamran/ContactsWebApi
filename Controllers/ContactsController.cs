@@ -1,5 +1,6 @@
 ﻿using AspWebApiGlebTest.Models.Domain;
 using AspWebApiGlebTest.Models.DTOs;
+using AspWebApiGlebTest.Models.Requests;
 using AspWebApiGlebTest.Repository.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +15,8 @@ namespace AspWebApiGlebTest.Controllers
 	public class ContactsController : ControllerBase
 	{
 		private readonly IContactRepository _repos;
+		private const int AllowedAmountOfItemPerPage = 50;
+
 		public ContactsController(IContactRepository repos) => _repos = repos;
 
 		/// <summary>
@@ -24,11 +27,21 @@ namespace AspWebApiGlebTest.Controllers
 		[HttpGet]
 		[ProducesResponseType(200)]
 		[ProducesResponseType(401)]
+		[ProducesResponseType(404)]
 		[Authorize(Roles ="User,Admin")]
-		public async Task<IActionResult> GetCotacts()
+		public async Task<IActionResult> GetCotacts([FromQuery] PageParametersRequest request)
 		{
-			var contacts = await _repos.GetContactsAsync();
-			return Ok(contacts);
+			if (!ModelState.IsValid) { return BadRequest(ModelState); }
+
+			var itemsPerPage = request.ItemsPerPage < AllowedAmountOfItemPerPage ? request.ItemsPerPage : AllowedAmountOfItemPerPage;
+			
+			var totalCount = await _repos.GetContactsCountAsync();
+			var contacts = await _repos.GetContactsAsync(itemsPerPage, request.CurrentPage);
+			
+			var pageInfo = new PageInfo(totalCount, itemsPerPage, request.CurrentPage);
+
+			var response = new { Contacts = contacts, PageInfo = pageInfo };
+			return Ok(response);
 		}
 
 		/// <summary>
@@ -134,5 +147,28 @@ namespace AspWebApiGlebTest.Controllers
 			}
 			return NotFound();
 		}
+
+		/// <summary>
+		/// Insert A Range Of Contacts
+		/// </summary>
+		/// <param name="users"></param>
+		/// <returns></returns>
+
+		[HttpPost]
+		[Route("bulkInsert")]
+		[ProducesResponseType(200)]
+		[ProducesResponseType(400)]
+		[ProducesResponseType(401)]
+		[ProducesResponseType(403)]
+		public async Task<IActionResult> BulkInsert([FromBody] List<Contact> users)
+		{
+			if (ModelState.IsValid)
+			{
+				await _repos.BulkInsertAsync(users);
+				return Ok($"{users.Count} Added");
+			}
+			return BadRequest(ModelState);
+		}
+
 	}
 }

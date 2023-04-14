@@ -13,12 +13,19 @@ namespace AspWebApiGlebTest.Repository.Dapper
 		public ContactRepositoryDapper(string connectionString) => _connectionString = connectionString;
 
 		//Get All Contacts
-		public async Task<IEnumerable<Contact>> GetContactsAsync()
+		public async Task<IEnumerable<Contact>> GetContactsAsync(int itemsPerPage, int currentPage)
 		{
+			int skip = (currentPage - 1) * itemsPerPage;
+			int take = itemsPerPage;
+
 			using (IDbConnection db = new SqlConnection(_connectionString))
 			{
-				string query = @"exec GetAllContacts";
-				return (await db.QueryAsync<Contact>(query, null)).ToList();
+				var parameters = new DynamicParameters();
+				parameters.Add("Skip", skip, DbType.Int32, ParameterDirection.Input);
+				parameters.Add("Take", take, DbType.Int32, ParameterDirection.Input);
+
+				string query = @"exec GetAllContactsPaginates @Skip, @Take";
+				return (await db.QueryAsync<Contact>(query, parameters)).ToList();
 			}
 		}
 
@@ -83,6 +90,25 @@ namespace AspWebApiGlebTest.Repository.Dapper
 				string query = @"exec UpdateContact @Id, @Name, @Surname, @Phone, @Email, @IsFavorite";
 				var updatedContact = await db.QuerySingleAsync<Contact>(query, parameters);
 				return updatedContact;
+			}
+		}
+
+		//Add range of Contacts
+		public async Task BulkInsertAsync(List<Contact> contacts)
+		{
+			foreach (var item in contacts)
+			{
+				await AddContactAsync(item);
+			}
+		}
+
+		//Get Contacts count
+		public async Task<int> GetContactsCountAsync()
+		{
+			using (IDbConnection db = new SqlConnection(_connectionString))
+			{
+				var count = await db.ExecuteScalarAsync<int>(@"SELECT COUNT(*) FROM Contacts");
+				return count;
 			}
 		}
 	}
